@@ -11,6 +11,14 @@
     name: 'RowsTextDot'
   }
 
+  let getBLen = function(str) {
+    if (str == null) return 0;
+    if (typeof str != "string"){
+      str += "";
+    }
+    return str.replace(/[^\x00-\xff]/g,"ab").length;
+  }
+
   Vue.directive('row-title', {
     inserted: function (el, binding) {
       let n = el.offsetHeight
@@ -35,6 +43,44 @@
       }
     }
   })
+
+
+  Vue.directive('max-byte', {
+    inserted: function (el, binding) {
+      let s = el.innerHTML
+      let maxByte = binding.value
+      let strByte = getBLen(s)
+      console.log(' ')
+      console.log('  ————————————')
+      console.log('maxByte', maxByte)
+      console.log('strByte', strByte)
+      console.log('binding', binding)
+
+      for (let i = 0; i < s.length; i++) {
+        let currentStr = s.substr(0, i+1)
+        let currentChar = s.charAt(i)
+        el.innerHTML = currentStr
+        let currentByte = getBLen(currentStr)
+        console.log(' ')
+        console.log('currentChar', currentChar)
+        console.log('currentStr', currentStr)
+        console.log('currentByte', currentByte)
+        if (currentByte > maxByte) {
+          let lastChar = currentChar
+          console.log('lastChar', lastChar)
+          let cutCharLength = 2
+          if (getBLen(lastChar) > 1) {//是中文
+            cutCharLength = 1
+          } else {
+            cutCharLength = 2
+          }
+          el.innerHTML = currentStr.substr(0, i-lastChar) + '...'
+          break
+        }
+      }
+    }
+  })
+
 
   function isChinese(temp) {
     let re = /[^\u4e00-\u9fa5]/
